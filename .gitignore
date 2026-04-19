@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+
+# Environment variables (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Build directories (if using TypeScript or a bundler)
+dist/
+build/
