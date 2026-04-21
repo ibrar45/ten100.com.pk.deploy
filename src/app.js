@@ -5,6 +5,7 @@ import roleRoute from "./modules/role/role.routes.js";
 import propertyRoute from "./modules/properties/property.routes.js";
 import profileRoute from "./modules/user/user.routes.js";
 import requestRouter from "./modules/request/request.routes.js";
+import hostelRouter from "./modules/hostel/hostel.routes.js";
 import {
   securityHeaders,
   corsMiddleware,
@@ -32,6 +33,7 @@ app.use("/api/role", roleRoute);
 app.use("/api/properties", propertyRoute);
 app.use("/api/profile", profileRoute);
 app.use("/api/requests", requestRouter);
+app.use("/api/hostels", hostelRouter);
 
 app.use(notFound);
 app.use(errorHandler);
