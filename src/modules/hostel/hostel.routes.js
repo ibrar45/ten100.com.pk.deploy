@@ -11,7 +11,7 @@ import {
 import { addRoomRules, createHostelRules } from "./hostel.validate.js";
 
 const hostelRouter = express.Router();
-
+//ibrar
 hostelRouter.post(
   "/create",
   protect,
