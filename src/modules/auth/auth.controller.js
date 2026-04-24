@@ -1,6 +1,6 @@
 import User from "./user.model.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../../utils/generateToken.js";
+import { generateToken, clearAuthCookie } from "../../utils/generateToken.js";
 
 const isProd = process.env.NODE_ENV === "production";
 // REGISTER
@@ -76,6 +76,14 @@ export const login = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    clearAuthCookie(res, { isProd });
+    res.json({ message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // GET /me
 export const getMe = async (req, res) => {

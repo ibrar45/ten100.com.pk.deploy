@@ -16,3 +16,13 @@ export function generateToken(res, userId, role, { isProd } = {}) {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
+
+/** Clears the auth cookie; options must align with `generateToken` so browsers remove the cookie. */
+export function clearAuthCookie(res, { isProd } = {}) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: Boolean(isProd),
+    sameSite: "lax",
+    path: "/",
+  });
+}
