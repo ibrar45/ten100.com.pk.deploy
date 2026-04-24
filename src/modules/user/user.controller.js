@@ -12,13 +12,16 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, phoneNumber, address } = req.body;
+    const { firstName, lastName, phoneNumber, gender, dateOfBirth, address } =
+      req.body;
 
     // Use Dot Notation for atomic updates of nested objects
     const updateData = {};
     if (firstName) updateData["profile.firstName"] = firstName;
     if (lastName) updateData["profile.lastName"] = lastName;
     if (phoneNumber) updateData["profile.phoneNumber"] = phoneNumber;
+    if (gender) updateData["profile.gender"] = gender;
+    if (dateOfBirth) updateData["profile.dateOfBirth"] = new Date(dateOfBirth);
     
     if (address) {
       if (address.street) updateData["address.street"] = address.street;
