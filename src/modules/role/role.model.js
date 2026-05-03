@@ -5,7 +5,7 @@ const roleSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    enum: ['tenant', 'landlord', 'hostel_owner'], // Strict validation
+    enum: ["user", "owner", "hostel_owner", "tenant", "landlord"],
   },
   description: {
     type: String,

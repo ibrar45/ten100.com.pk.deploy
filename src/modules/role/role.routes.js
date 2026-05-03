@@ -2,6 +2,7 @@
 // routes/role.routes.js
 import { Router } from 'express';
 import { getRoles, seedRoles } from './role.controller.js';
+import { sendError } from "../../utils/http.js";
 
 const roleRoute = Router();
 
@@ -9,13 +10,16 @@ const roleRoute = Router();
 const requireRoleSeedSecret = (req, res, next) => {
   const expected = process.env.ROLE_SEED_KEY?.trim();
   if (!expected) {
-    return res
-      .status(403)
-      .json({ success: false, message: "Role seeding is disabled (ROLE_SEED_KEY not set)" });
+    return sendError(
+      res,
+      403,
+      "ROLE_SEED_DISABLED",
+      "Role seeding is disabled (ROLE_SEED_KEY not set)"
+    );
   }
   const provided = String(req.headers["x-role-seed-key"] || "").trim();
   if (provided !== expected) {
-    return res.status(403).json({ success: false, message: "Forbidden" });
+    return sendError(res, 403, "FORBIDDEN", "Forbidden");
   }
   next();
 };

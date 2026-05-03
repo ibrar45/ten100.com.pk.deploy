@@ -1,5 +1,7 @@
 import { Property } from "./properties.model.js";
 import { getPagination } from "../../config/pagination.js";
+import { logger } from "../../config/logger.js";
+import { sendError, sendSuccess } from "../../utils/http.js";
 function buildDefaultTitle(body) {
   const cat = body.category || "Listing";
   const area = body.location?.area || "";
@@ -26,9 +28,12 @@ export const createProperty = async (req, res) => {
     } = req.body;
 
     if (Number(attachedBaths) > Number(bathrooms)) {
-      return res.status(400).json({
-        message: "Attached bathrooms cannot exceed total bathrooms.",
-      });
+      return sendError(
+        res,
+        400,
+        "PROPERTY_INVALID_BATHROOM_COUNTS",
+        "Attached bathrooms cannot exceed total bathrooms."
+      );
     }
 
     const title =
@@ -63,23 +68,22 @@ export const createProperty = async (req, res) => {
 
     const savedProperty = await newProperty.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Property listed successfully",
-      data: savedProperty,
-    });
+    return sendSuccess(res, savedProperty, { status: 201, message: "Property listed successfully" });
   } catch (error) {
-    console.error("Property Creation Error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    logger.error("property_create_failed", {
+      message: error?.message,
+      code: error?.code,
+    });
+    return sendError(res, 500, "PROPERTY_CREATE_FAILED", "Failed to create property");
   }
 };
 
 export const getMyProperties = async (req, res) => {
   try {
     const properties = await Property.find({ landlord: req.userId });
-    res.status(200).json({ success: true, data: properties });
+    return sendSuccess(res, properties);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return sendError(res, 500, "PROPERTY_FETCH_MINE_FAILED", "Failed to fetch your properties");
   }
 };
 
@@ -95,15 +99,10 @@ export const getAllProperties = async (req, res) => {
         .lean(),
       Property.countDocuments(),
     ]);
-    res.status(200).json({
-      success: true,
-      page,
-      limit,
-      total,
-      pages: Math.ceil(total / limit) || 1,
-      data: items,
+    return sendSuccess(res, items, {
+      meta: { page, limit, total, pages: Math.ceil(total / limit) || 1 },
     });
   } catch (error) {
-    next(error);
+    return sendError(res, 500, "PROPERTY_FETCH_ALL_FAILED", "Failed to fetch properties");
   }
 };

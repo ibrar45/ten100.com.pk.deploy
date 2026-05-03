@@ -1,4 +1,5 @@
 import express from "express";
+import path from "node:path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./modules/auth/auth.routes.js";
 import roleRoute from "./modules/role/role.routes.js";
@@ -6,6 +7,7 @@ import propertyRoute from "./modules/properties/property.routes.js";
 import profileRoute from "./modules/user/user.routes.js";
 import requestRouter from "./modules/request/request.routes.js";
 import hostelRouter from "./modules/hostel/hostel.routes.js";
+import bedRouter from "./modules/bed/bed.routes.js";
 import {
   securityHeaders,
   corsMiddleware,
@@ -24,6 +26,7 @@ const app = express();
 
 app.use(securityHeaders());
 app.use(corsMiddleware(corsOrigins, isProd));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 app.use("/api", apiLimiter);
@@ -34,6 +37,7 @@ app.use("/api/properties", propertyRoute);
 app.use("/api/profile", profileRoute);
 app.use("/api/requests", requestRouter);
 app.use("/api/hostels", hostelRouter);
+app.use("/api/beds", bedRouter);
 
 app.use(notFound);
 app.use(errorHandler);

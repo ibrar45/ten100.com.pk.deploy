@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["tenant", "landlord", "hostel_owner"],
+      enum: ["user", "owner", "hostel_owner", "tenant", "landlord"],
       required: true,
     },
     profile: {
@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
       state: { type: String, trim: true },
       zipCode: { type: String, trim: true },
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

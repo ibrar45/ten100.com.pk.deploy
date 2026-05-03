@@ -1,5 +1,6 @@
 import { Request } from "./request.model.js";
 import { Property } from "../properties/properties.model.js";
+import { sendError, sendSuccess } from "../../utils/http.js";
 
 // 1. Tenant sends a request
 export const sendInterestRequest = async (req, res) => {
@@ -7,7 +8,7 @@ export const sendInterestRequest = async (req, res) => {
     const { propertyId, message } = req.body;
 
     const property = await Property.findById(propertyId);
-    if (!property) return res.status(404).json({ message: "Property not found" });
+    if (!property) return sendError(res, 404, "PROPERTY_NOT_FOUND", "Property not found");
 
     // Create the connection
     const newRequest = await Request.create({
@@ -17,10 +18,12 @@ export const sendInterestRequest = async (req, res) => {
       tenantMessage: message
     });
 
-    res.status(201).json({ success: true, message: "Interest sent to landlord", data: newRequest });
+    return sendSuccess(res, newRequest, { status: 201, message: "Interest sent to landlord" });
   } catch (error) {
-    if (error.code === 11000) return res.status(400).json({ message: "Request already exists" });
-    res.status(500).json({ success: false, message: error.message });
+    if (error.code === 11000) {
+      return sendError(res, 409, "REQUEST_ALREADY_EXISTS", "Request already exists");
+    }
+    return sendError(res, 500, "REQUEST_SEND_FAILED", "Failed to send request");
   }
 };
 
@@ -33,9 +36,9 @@ export const getLandlordInbox = async (req, res) => {
       .populate("property", "title address price")
       .sort("-createdAt");
 
-    res.status(200).json({ success: true, data: inbox });
+    return sendSuccess(res, inbox);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return sendError(res, 500, "REQUEST_INBOX_FETCH_FAILED", "Failed to fetch inbox");
   }
 };
 
@@ -54,15 +57,11 @@ export const updateRequestStatus = async (req, res) => {
       { new: true }
     );
 
-    if (!updatedRequest) return res.status(404).json({ message: "Request not found" });
+    if (!updatedRequest) return sendError(res, 404, "REQUEST_NOT_FOUND", "Request not found");
 
-    res.status(200).json({ 
-      success: true, 
-      message: `Request ${status} successfully`, 
-      data: updatedRequest 
-    });
+    return sendSuccess(res, updatedRequest, { message: `Request ${status} successfully` });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return sendError(res, 500, "REQUEST_STATUS_UPDATE_FAILED", "Failed to update request");
   }
 };
 
@@ -76,12 +75,8 @@ export const getTenantRequests = async (req, res) => {
       .sort("-createdAt")
       .lean(); // Use lean for faster read performance
 
-    res.status(200).json({
-      success: true,
-      count: myRequests.length,
-      data: myRequests
-    });
+    return sendSuccess(res, myRequests, { meta: { count: myRequests.length } });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return sendError(res, 500, "REQUEST_LIST_FAILED", "Failed to fetch tenant requests");
   }
 };
